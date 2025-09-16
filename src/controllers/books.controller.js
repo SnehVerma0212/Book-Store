@@ -28,4 +28,53 @@ const addBook = async(req,res) => {
     }
 }
 
-module.exports = addBook;
+const getBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (id) {
+      // Fetch single book
+      const book = await Book.findById(id);
+      if (!book) {
+        return res.status(404).json({
+          message: "Book not found with the given id.",
+        });
+      }
+      return res.status(200).json({
+        message: "Book fetched successfully.",
+        data: book,
+      });
+    } else {
+      // Fetch all books
+      const allBooks = await Book.find();
+      if (allBooks.length === 0) {
+        return res.status(200).json({
+          message: "No books available.",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        message: "All books fetched successfully.",
+        data: allBooks,
+      });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({
+      message: "Internal server error.",
+    });
+  }
+};
+
+// const updateBook = async(req,res) => {
+//     try{
+//         const { id } 
+//     }catch(err){
+
+//     }
+// }
+
+module.exports = {
+    addBook,
+    getBook
+}
