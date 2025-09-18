@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Book = require("./../models/book.model");
 
 const addBook = async(req,res) => {
@@ -46,7 +47,13 @@ const getBook = async (req, res) => {
       });
     } else {
       // Fetch all books
-      const allBooks = await Book.find();
+      
+      // Adding pagination with default limit of every page to  be 10.
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page-1)*limit;
+
+      const allBooks = await Book.find().skip(skip).limit(limit);
       if (allBooks.length === 0) {
         return res.status(200).json({
           message: "No books available.",
@@ -66,15 +73,59 @@ const getBook = async (req, res) => {
   }
 };
 
-// const updateBook = async(req,res) => {
-//     try{
-//         const { id } 
-//     }catch(err){
+const updateBook = async(req,res) => {
+    try{
+        const { id } = req.params;
+        const updatedBook = req.body;
+        if(!mongoose.Types.ObjectId.isValid(id)){
+          return res.status(400).json({
+            msg: "Invalid book id."
+          })
+        } 
+        const findBook = await Book.findByIdAndUpdate(id, updatedBook, {new: true});
+        if(!findBook){
+          return res.status(404).json({
+            msg: "Book not found."
+          })
+        }
+        res.status(200).json({
+          msg: "Book updated successfully."
+        })
+    }catch(err){
+      return res.status(500).json({
+        msg: "Internal server error."
+      })
+    }
+}
 
-//     }
-// }
+const deleteBook = async(req,res) => {
+  try{
+    const { id }= req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)){
+      return res.status(400).json({
+        msg: "Invalid book id."
+      })
+    }
+    const deletedBook = await Book.findByIdAndDelete(id);
+    if(!deletedBook){
+      return res.status(404).json({
+        msg: "Book not found!"
+      })
+    }
+    res.status(200).json({
+      msg: "Book deleted successfully."
+    })
+  }catch(err){
+    console.log(err.message);
+    return res.status(500).json({
+      msg: "Internal server error."
+    })
+  }
+}
 
 module.exports = {
     addBook,
-    getBook
+    getBook,
+    updateBook,
+    deleteBook
 }
