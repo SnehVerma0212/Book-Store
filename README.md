@@ -1,204 +1,164 @@
-# Book API
+# 📚 Book Store API
 
-A simple RESTful API for managing books, built with **Node.js**, **Express.js**, and **MongoDB (Mongoose)**.
+A simple RESTful API built with **Node.js**, **Express**, and **MongoDB (Mongoose)** to manage a collection of books.
+This project supports basic **CRUD operations** along with **pagination** for fetching books.
 
 ---
 
 ## 🚀 Features
 
-* Create a new book
-* Get all books
-* Get a single book by ID
-* Update a book by ID
-* Delete a book by ID
-
----
-
-## 🛠️ Tech Stack
-
-* **Node.js** - JavaScript runtime
-* **Express.js** - Web framework
-* **MongoDB** - NoSQL database
-* **Mongoose** - ODM for MongoDB
+* ➕ Add a new book
+* 📖 Get all books with **pagination**
+* 📘 Get a single book by **ID**
+* ✏️ Update a book by **ID**
+* ❌ Delete a book by **ID**
+* ⚠️ Proper error handling with meaningful **HTTP status codes**
 
 ---
 
 ## 📂 Project Structure
 
 ```bash
-.
-├── models
-│   └── book.js       # Mongoose schema for Book
-├── routes
-│   └── book.js       # Book-related routes
-├── server.js         # Main server entry point
-└── package.json      # Dependencies and scripts
+BOOK STORE/
+│── node_modules/
+│── src/
+│   ├── config/
+│   │   └── db.js               # Database connection
+│   ├── controllers/
+│   │   └── books.controller.js # Controller logic
+│   ├── models/
+│   │   └── book.model.js       # Mongoose Book schema
+│   ├── routes/
+│   │   └── books.routes.js     # Routes for book APIs
+│   ├── middlewares/
+│   │   └── error.middleware.js # Centralized error handling
+│   ├── utils/
+│   │   └── logger.js           # Logger utility (optional)
+│   └── app.js                  # Express app setup
+│── .env                        # Environment variables
+│── .gitignore
+│── package.json
+│── package-lock.json
+│── README.md
+│── server.js                   # Server entry point
 ```
 
 ---
 
 ## ⚙️ Installation & Setup
 
-1. Clone the repository:
+1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/your-username/book-api.git
-   cd book-api
+   git clone https://github.com/your-username/book-store-api.git
+   cd book-store-api
    ```
 
-2. Install dependencies:
+2. **Install dependencies**
 
    ```bash
    npm install
    ```
 
-3. Create a **.env** file in the root directory and add your MongoDB URI:
+3. **Set up environment variables in `.env`**
 
    ```env
-   MONGO_URI=mongodb://localhost:27017/booksdb
    PORT=5000
+   MONGO_URI=your_mongodb_connection_string
    ```
 
-4. Start the server:
+4. **Run the server**
 
    ```bash
    npm start
    ```
 
-The server will run on **[http://localhost:5000](http://localhost:5000)**.
+   For development with **nodemon**:
+
+   ```bash
+   npm run dev
+   ```
 
 ---
 
-## 📖 API Endpoints
+## 📡 API Endpoints
 
-### 1. Get all books
+### Base URL
 
-```http
-GET /api/books
+```
+http://localhost:5000/api/books
 ```
 
-**Response:**
+### Endpoints Overview
 
-```json
-[
-  {
-    "_id": "64a1c12345efabc6789d0123",
-    "title": "Book Title",
-    "author": "Author Name",
-    "year": 2023
-  }
-]
-```
+| Method | Endpoint        | Description               |
+| ------ | --------------- | ------------------------- |
+| POST   | /api/books      | Add a new book            |
+| GET    | /api/books      | Get all books (paginated) |
+| GET    | /api/books/\:id | Get a book by ID          |
+| PUT    | /api/books/\:id | Update a book by ID       |
+| DELETE | /api/books/\:id | Delete a book by ID       |
 
 ---
 
-### 2. Get a single book by ID
+### ➕ Add a Book
 
-```http
-GET /api/books/:id
-```
+**POST** `/api/books`
 
-**Response:**
+#### Request Body (JSON)
 
 ```json
 {
-  "_id": "64a1c12345efabc6789d0123",
-  "title": "Book Title",
-  "author": "Author Name",
-  "year": 2023
+  "title": "The Hobbit",
+  "author": "J.R.R. Tolkien",
+  "genre": "Fantasy",
+  "publishedDate": "1937-09-21"
 }
 ```
 
 ---
 
-### 3. Create a new book
+### 📖 Get All Books (with Pagination)
 
-```http
-POST /api/books
-```
+**GET** `/api/books?page=1&limit=10`
 
-**Request Body:**
+#### Query Params
+
+* `page` → page number (default: 1)
+* `limit` → number of books per page (default: 10)
+
+---
+
+### 📘 Get Single Book by ID
+
+**GET** `/api/books/:id`
+
+---
+
+### ✏️ Update a Book
+
+**PUT** `/api/books/:id`
+
+#### Request Body (JSON)
 
 ```json
 {
-  "title": "New Book",
-  "author": "John Doe",
-  "year": 2025
-}
-```
-
-**Response:**
-
-```json
-{
-  "_id": "64a1c67890efabc1234d5678",
-  "title": "New Book",
-  "author": "John Doe",
-  "year": 2025
+  "title": "The Hobbit: An Unexpected Journey",
+  "author": "J.R.R. Tolkien"
 }
 ```
 
 ---
 
-### 4. Update a book by ID
+### ❌ Delete a Book
 
-```http
-PUT /api/books/:id
-```
-
-**Request Body:**
-
-```json
-{
-  "title": "Updated Title",
-  "author": "Jane Doe",
-  "year": 2024
-}
-```
-
-**Response:**
-
-```json
-{
-  "_id": "64a1c12345efabc6789d0123",
-  "title": "Updated Title",
-  "author": "Jane Doe",
-  "year": 2024
-}
-```
+**DELETE** `/api/books/:id`
 
 ---
 
-### 5. Delete a book by ID
+## 🛠️ Tech Stack
 
-```http
-DELETE /api/books/:id
-```
-
-**Response:**
-
-```json
-{
-  "message": "Book deleted successfully"
-}
-```
-
----
-
-## 🧪 Testing the API
-
-You can test the endpoints using **Postman**, **Thunder Client**, or **cURL**.
-
-Example with cURL:
-
-```bash
-curl -X POST http://localhost:5000/api/books \
--H "Content-Type: application/json" \
--d '{"title":"Book Title","author":"Author Name","year":2025}'
-```
-
----
-
-## 📜 License
-
-This project is licensed under the **MIT License**.
+* **Node.js**
+* **Express.js**
+* **MongoDB with Mongoose**
+* **dotenv** for environment configuration
